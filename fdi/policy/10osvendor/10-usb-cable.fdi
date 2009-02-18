@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<deviceinfo version="0.2">
+
+  <device>
+    <match key="button.type" string="usb.cable">
+      <append key="info.addons" type="strlist">hald-addon-usb-cable</append>
+    </match>
+  </device>
+
+</deviceinfo>

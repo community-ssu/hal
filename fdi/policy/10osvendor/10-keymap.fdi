@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="ISO-8859-1"?> <!-- -*- SGML -*- -->
+<deviceinfo version="0.2">
+  <device>
+    <match key="info.capabilities" contains="input.keymap">
+      <append key="info.callouts.add" type="strlist">hal-setup-keymap</append>
+    </match>
+
+    <match key="info.capabilities" contains="input.keys">
+      <merge key="input.xkb.rules" type="string">base</merge>
+
+      <!-- If we're using Linux, we use evdev by default (falling back to
+           keyboard otherwise). -->
+      <merge key="input.xkb.model" type="string">keyboard</merge>
+      <match key="/org/freedesktop/Hal/devices/computer:system.kernel.name"
+             string="Linux">
+        <merge key="input.xkb.model" type="string">evdev</merge>
+      </match>
+
+      <!-- XXX: RX-51 default keyboard model (the default should be sane
+                instead). -->
+      <match key="/org/freedesktop/Hal/devices/computer:system.hardware.product"
+             string="RX-51">
+        <merge key="input.xkb.model" type="string">nokiarx51</merge>
+      </match>
+
+      <merge key="input.xkb.layout" type="string">us</merge>
+      <merge key="input.xkb.variant" type="string" />
+      <merge key="input.xkb.options" type="strlist" />
+
+      <!-- RX-44/RX-48/RX-51 internal keypad. -->
+      <match key="info.product" string="Internal keyboard">
+        <match key="/org/freedesktop/Hal/devices/computer:system.hardware.product"
+               string="RX-44">
+          <merge key="input.xkb.model" type="string">nokiarx44</merge>
+        </match>
+        <match key="/org/freedesktop/Hal/devices/computer:system.hardware.product"
+               string="RX-48">
+          <merge key="input.xkb.model" type="string">nokiarx44</merge>
+        </match>
+        <match key="/org/freedesktop/Hal/devices/computer:system.hardware.product"
+               string="RX-51">
+          <merge key="input.xkb.model" type="string">nokiarx51</merge>
+        </match>
+      </match>
+
+      <!-- XXX: RX-51 internal keypad (the kernel should be fixed). -->
+      <match key="info.product" string="omap_twl4030keypad">
+        <match key="/org/freedesktop/Hal/devices/computer:system.hardware.product"
+               string="RX-51">
+          <merge key="input.xkb.model" type="string">nokiarx51</merge>
+        </match>
+      </match>
+
+      <match key="input.product" string="Nokia SU-8W">
+        <merge key="input.xkb.model" type="string">nokiasu8w</merge>
+      </match>
+    </match>
+  </device>
+</deviceinfo>

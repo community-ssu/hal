@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<deviceinfo version="0.2">
+  <!-- XXX: Major hack here, this needs to be spawned from a proper class -->
+  <device>
+    <match key="system.kernel.name" string="Linux">
+      <match key="system.hardware.product" string="RX-44">
+        <spawn udi="/org/freedesktop/Hal/devices/als"/>
+      </match>
+      <match key="system.hardware.product" string="RX-48">
+        <spawn udi="/org/freedesktop/Hal/devices/als"/>
+      </match>
+      <match key="system.hardware.product" string="RX-51">
+        <spawn udi="/org/freedesktop/Hal/devices/als"/>
+      </match>
+    </match>
+  </device>
+
+  <device>
+    <match key="info.udi" string="/org/freedesktop/Hal/devices/als">
+      <append key="info.capabilities" type="strlist">light_sensor</append>
+      <merge key="info.product" type="string">Ambient Light Sensor</merge>
+      <merge key="light_sensor.num_sensors" type="int">1</merge>
+      <append key="info.addons" type="strlist">hald-addon-als</append>
+    </match>
+  </device>
+
+</deviceinfo>
