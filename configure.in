@@ -8,7 +8,7 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59c)
 AC_INIT(hal, 0.5.12, david@fubar.dk)
-AM_INIT_AUTOMAKE([gnu 1.9])
+AM_INIT_AUTOMAKE([gnu 1.8])
 AM_MAINTAINER_MODE
 
 glib_module="glib-2.0 >= 2.10.0 gobject-2.0 > 2.10.0 dbus-glib-1 >= 0.61"
@@ -414,6 +414,7 @@ if test "x$use_smbios" = "xyes" ; then
 	AC_LANG_POP([C++])
 	if test "$LIB_SMBIOS" = "yes" ; then
    		AC_MSG_CHECKING([for libsmbios >= 0.13.4])
+   		LIBS="$LIBS -lsmbios"
    		AC_RUN_IFELSE([AC_LANG_SOURCE([[
    		#include <smbios/version.h>
    		int main ()

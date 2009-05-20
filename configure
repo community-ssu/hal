@@ -808,7 +808,6 @@ target_alias
 INSTALL_PROGRAM
 INSTALL_SCRIPT
 INSTALL_DATA
-am__isrc
 CYGPATH_W
 PACKAGE
 VERSION
@@ -817,6 +816,7 @@ AUTOCONF
 AUTOMAKE
 AUTOHEADER
 MAKEINFO
+AMTAR
 install_sh
 STRIP
 INSTALL_STRIP_PROGRAM
@@ -824,9 +824,6 @@ mkdir_p
 AWK
 SET_MAKE
 am__leading_dot
-AMTAR
-am__tar
-am__untar
 MAINTAINER_MODE_TRUE
 MAINTAINER_MODE_FALSE
 MAINT
@@ -2134,8 +2131,7 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
-am__api_version='1.10'
-
+am__api_version="1.8"
 ac_aux_dir=
 for ac_dir in "$srcdir" "$srcdir/.." "$srcdir/../.."; do
   if test -f "$ac_dir/install-sh"; then
@@ -2318,53 +2314,30 @@ else
 echo "$as_me: WARNING: \`missing' script is too old or missing" >&2;}
 fi
 
-{ echo "$as_me:$LINENO: checking for a thread-safe mkdir -p" >&5
-echo $ECHO_N "checking for a thread-safe mkdir -p... $ECHO_C" >&6; }
-if test -z "$MKDIR_P"; then
-  if test "${ac_cv_path_mkdir+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
+if mkdir -p --version . >/dev/null 2>&1 && test ! -d ./--version; then
+  # Keeping the `.' argument allows $(mkdir_p) to be used without
+  # argument.  Indeed, we sometimes output rules like
+  #   $(mkdir_p) $(somedir)
+  # where $(somedir) is conditionally defined.
+  # (`test -n '$(somedir)' && $(mkdir_p) $(somedir)' is a more
+  # expensive solution, as it forces Make to start a sub-shell.)
+  mkdir_p='mkdir -p -- .'
 else
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH$PATH_SEPARATOR/opt/sfw/bin
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_prog in mkdir gmkdir; do
-	 for ac_exec_ext in '' $ac_executable_extensions; do
-	   { test -f "$as_dir/$ac_prog$ac_exec_ext" && $as_test_x "$as_dir/$ac_prog$ac_exec_ext"; } || continue
-	   case `"$as_dir/$ac_prog$ac_exec_ext" --version 2>&1` in #(
-	     'mkdir (GNU coreutils) '* | \
-	     'mkdir (coreutils) '* | \
-	     'mkdir (fileutils) '4.1*)
-	       ac_cv_path_mkdir=$as_dir/$ac_prog$ac_exec_ext
-	       break 3;;
-	   esac
-	 done
-       done
-done
-IFS=$as_save_IFS
-
-fi
-
-  if test "${ac_cv_path_mkdir+set}" = set; then
-    MKDIR_P="$ac_cv_path_mkdir -p"
+  # On NextStep and OpenStep, the `mkdir' command does not
+  # recognize any option.  It will interpret all options as
+  # directories to create, and then abort because `.' already
+  # exists.
+  for d in ./-p ./--version;
+  do
+    test -d $d && rmdir $d
+  done
+  # $(mkinstalldirs) is defined by Automake if mkinstalldirs exists.
+  if test -f "$ac_aux_dir/mkinstalldirs"; then
+    mkdir_p='$(mkinstalldirs)'
   else
-    # As a last resort, use the slow shell script.  Don't cache a
-    # value for MKDIR_P within a source directory, because that will
-    # break other packages using the cache if that directory is
-    # removed, or if the value is a relative name.
-    test -d ./--version && rmdir ./--version
-    MKDIR_P="$ac_install_sh -d"
+    mkdir_p='$(install_sh) -d'
   fi
 fi
-{ echo "$as_me:$LINENO: result: $MKDIR_P" >&5
-echo "${ECHO_T}$MKDIR_P" >&6; }
-
-mkdir_p="$MKDIR_P"
-case $mkdir_p in
-  [\\/$]* | ?:[\\/]*) ;;
-  */*) mkdir_p="\$(top_builddir)/$mkdir_p" ;;
-esac
 
 for ac_prog in gawk mawk nawk awk
 do
@@ -2447,16 +2420,12 @@ else
 fi
 rmdir .tst 2>/dev/null
 
-if test "`cd $srcdir && pwd`" != "`pwd`"; then
-  # Use -I$(srcdir) only when $(srcdir) != ., so that make's output
-  # is not polluted with repeated "-I."
-  am__isrc=' -I$(srcdir)'
-  # test to see if srcdir already configured
-  if test -f $srcdir/config.status; then
-    { { echo "$as_me:$LINENO: error: source directory already configured; run \"make distclean\" there first" >&5
+# test to see if srcdir already configured
+if test "`cd $srcdir && pwd`" != "`pwd`" &&
+   test -f $srcdir/config.status; then
+  { { echo "$as_me:$LINENO: error: source directory already configured; run \"make distclean\" there first" >&5
 echo "$as_me: error: source directory already configured; run \"make distclean\" there first" >&2;}
    { (exit 1); exit 1; }; }
-  fi
 fi
 
 # test whether we have cygpath
@@ -2499,7 +2468,10 @@ AUTOHEADER=${AUTOHEADER-"${am_missing_run}autoheader"}
 
 MAKEINFO=${MAKEINFO-"${am_missing_run}makeinfo"}
 
-install_sh=${install_sh-"\$(SHELL) $am_aux_dir/install-sh"}
+
+AMTAR=${AMTAR-"${am_missing_run}tar"}
+
+install_sh=${install_sh-"$am_aux_dir/install-sh"}
 
 # Installed binaries are usually stripped using `strip' when the user
 # run `make install-strip'.  However `strip' might not be the right
@@ -2603,17 +2575,10 @@ else
 fi
 
 fi
-INSTALL_STRIP_PROGRAM="\$(install_sh) -c -s"
+INSTALL_STRIP_PROGRAM="\${SHELL} \$(install_sh) -c -s"
 
 # We need awk for the "check" target.  The system "awk" is bad on
 # some platforms.
-# Always define AMTAR for backward compatibility.
-
-AMTAR=${AMTAR-"${am_missing_run}tar"}
-
-am__tar='${AMTAR} chof - "$$tardir"'; am__untar='${AMTAR} xf -'
-
-
 
 
 
@@ -2628,7 +2593,9 @@ fi
 
   { echo "$as_me:$LINENO: result: $USE_MAINTAINER_MODE" >&5
 echo "${ECHO_T}$USE_MAINTAINER_MODE" >&6; }
-   if test $USE_MAINTAINER_MODE = yes; then
+
+
+if test $USE_MAINTAINER_MODE = yes; then
   MAINTAINER_MODE_TRUE=
   MAINTAINER_MODE_FALSE='#'
 else
@@ -2709,13 +2676,16 @@ if test "x$enable_dependency_tracking" != xno; then
   am_depcomp="$ac_aux_dir/depcomp"
   AMDEPBACKSLASH='\'
 fi
- if test "x$enable_dependency_tracking" != xno; then
+
+
+if test "x$enable_dependency_tracking" != xno; then
   AMDEP_TRUE=
   AMDEP_FALSE='#'
 else
   AMDEP_TRUE='#'
   AMDEP_FALSE=
 fi
+
 
 
 ac_ext=c
@@ -3704,7 +3674,6 @@ else
        depfile=sub/conftest.Po tmpdepfile=sub/conftest.TPo \
        $SHELL ./depcomp $depcc -c -o sub/conftest.${OBJEXT-o} sub/conftest.c \
          >/dev/null 2>conftest.err &&
-       grep sub/conftst1.h sub/conftest.Po > /dev/null 2>&1 &&
        grep sub/conftst6.h sub/conftest.Po > /dev/null 2>&1 &&
        grep sub/conftest.${OBJEXT-o} sub/conftest.Po > /dev/null 2>&1 &&
        ${MAKE-make} -s -f confmf > /dev/null 2>&1; then
@@ -3734,7 +3703,9 @@ fi
 echo "${ECHO_T}$am_cv_CC_dependencies_compiler_type" >&6; }
 CCDEPMODE=depmode=$am_cv_CC_dependencies_compiler_type
 
- if
+
+
+if
   test "x$enable_dependency_tracking" != xno \
   && test "$am_cv_CC_dependencies_compiler_type" = gcc3; then
   am__fastdepCC_TRUE=
@@ -3746,12 +3717,14 @@ fi
 
 
 
-{ echo "$as_me:$LINENO: checking for library containing strerror" >&5
-echo $ECHO_N "checking for library containing strerror... $ECHO_C" >&6; }
-if test "${ac_cv_search_strerror+set}" = set; then
+
+        { echo "$as_me:$LINENO: checking for strerror in -lcposix" >&5
+echo $ECHO_N "checking for strerror in -lcposix... $ECHO_C" >&6; }
+if test "${ac_cv_lib_cposix_strerror+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  ac_func_search_save_LIBS=$LIBS
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lcposix  $LIBS"
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -3774,14 +3747,7 @@ return strerror ();
   return 0;
 }
 _ACEOF
-for ac_lib in '' cposix; do
-  if test -z "$ac_lib"; then
-    ac_res="none required"
-  else
-    ac_res=-l$ac_lib
-    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
-  fi
-  rm -f conftest.$ac_objext conftest$ac_exeext
+rm -f conftest.$ac_objext conftest$ac_exeext
 if { (ac_try="$ac_link"
 case "(($ac_try" in
   *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
@@ -3799,35 +3765,25 @@ eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
 	 test ! -s conftest.err
        } && test -s conftest$ac_exeext &&
        $as_test_x conftest$ac_exeext; then
-  ac_cv_search_strerror=$ac_res
+  ac_cv_lib_cposix_strerror=yes
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-
+	ac_cv_lib_cposix_strerror=no
 fi
 
 rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
-      conftest$ac_exeext
-  if test "${ac_cv_search_strerror+set}" = set; then
-  break
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
 fi
-done
-if test "${ac_cv_search_strerror+set}" = set; then
-  :
-else
-  ac_cv_search_strerror=no
+{ echo "$as_me:$LINENO: result: $ac_cv_lib_cposix_strerror" >&5
+echo "${ECHO_T}$ac_cv_lib_cposix_strerror" >&6; }
+if test $ac_cv_lib_cposix_strerror = yes; then
+  LIBS="$LIBS -lcposix"
 fi
-rm conftest.$ac_ext
-LIBS=$ac_func_search_save_LIBS
-fi
-{ echo "$as_me:$LINENO: result: $ac_cv_search_strerror" >&5
-echo "${ECHO_T}$ac_cv_search_strerror" >&6; }
-ac_res=$ac_cv_search_strerror
-if test "$ac_res" != no; then
-  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
 
-fi
+
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -4572,7 +4528,6 @@ else
        depfile=sub/conftest.Po tmpdepfile=sub/conftest.TPo \
        $SHELL ./depcomp $depcc -c -o sub/conftest.${OBJEXT-o} sub/conftest.c \
          >/dev/null 2>conftest.err &&
-       grep sub/conftst1.h sub/conftest.Po > /dev/null 2>&1 &&
        grep sub/conftst6.h sub/conftest.Po > /dev/null 2>&1 &&
        grep sub/conftest.${OBJEXT-o} sub/conftest.Po > /dev/null 2>&1 &&
        ${MAKE-make} -s -f confmf > /dev/null 2>&1; then
@@ -4602,7 +4557,9 @@ fi
 echo "${ECHO_T}$am_cv_CC_dependencies_compiler_type" >&6; }
 CCDEPMODE=depmode=$am_cv_CC_dependencies_compiler_type
 
- if
+
+
+if
   test "x$enable_dependency_tracking" != xno \
   && test "$am_cv_CC_dependencies_compiler_type" = gcc3; then
   am__fastdepCC_TRUE=
@@ -5044,7 +5001,6 @@ else
        depfile=sub/conftest.Po tmpdepfile=sub/conftest.TPo \
        $SHELL ./depcomp $depcc -c -o sub/conftest.${OBJEXT-o} sub/conftest.c \
          >/dev/null 2>conftest.err &&
-       grep sub/conftst1.h sub/conftest.Po > /dev/null 2>&1 &&
        grep sub/conftst6.h sub/conftest.Po > /dev/null 2>&1 &&
        grep sub/conftest.${OBJEXT-o} sub/conftest.Po > /dev/null 2>&1 &&
        ${MAKE-make} -s -f confmf > /dev/null 2>&1; then
@@ -5074,7 +5030,9 @@ fi
 echo "${ECHO_T}$am_cv_CXX_dependencies_compiler_type" >&6; }
 CXXDEPMODE=depmode=$am_cv_CXX_dependencies_compiler_type
 
- if
+
+
+if
   test "x$enable_dependency_tracking" != xno \
   && test "$am_cv_CXX_dependencies_compiler_type" = gcc3; then
   am__fastdepCXX_TRUE=
@@ -5209,7 +5167,6 @@ if eval "test \"`echo '$ac_cv_prog_cc_'${ac_cc}_c_o`\" != yes"; then
    # and then we could set am__CC="\$(top_srcdir)/compile \$(CC)"
    CC="$am_aux_dir/compile $CC"
 fi
-
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -6303,7 +6260,7 @@ linux* | k*bsd*-gnu)
   lt_cv_deplibs_check_method=pass_all
   ;;
 
-netbsd* | netbsdelf*-gnu)
+netbsd*)
   if echo __ELF__ | $CC -E - | grep __ELF__ > /dev/null; then
     lt_cv_deplibs_check_method='match_pattern /lib[^/]+(\.so\.[0-9]+\.[0-9]+|_pic\.a)$'
   else
@@ -6423,7 +6380,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 6426 "configure"' > conftest.$ac_ext
+  echo '#line 6383 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -8603,11 +8560,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8606: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8563: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8610: \$? = $ac_status" >&5
+   echo "$as_me:8567: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8893,11 +8850,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8896: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8853: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8900: \$? = $ac_status" >&5
+   echo "$as_me:8857: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8997,11 +8954,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:9000: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8957: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:9004: \$? = $ac_status" >&5
+   echo "$as_me:8961: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9262,13 +9219,12 @@ EOF
   $echo "local: *; };" >> $output_objdir/$libname.ver~
 	  $CC '"$tmp_sharedflag""$tmp_addflag"' $libobjs $deplibs $compiler_flags ${wl}-soname $wl$soname ${wl}-version-script ${wl}$output_objdir/$libname.ver -o $lib'
 	fi
-	link_all_deplibs=no
       else
 	ld_shlibs=no
       fi
       ;;
 
-    netbsd* | netbsdelf*-gnu)
+    netbsd*)
       if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
 	archive_cmds='$LD -Bshareable $libobjs $deplibs $linker_flags -o $lib'
 	wlarc=
@@ -9811,7 +9767,7 @@ if test -z "$aix_libpath"; then aix_libpath="/usr/lib:/lib"; fi
       link_all_deplibs=yes
       ;;
 
-    netbsd* | netbsdelf*-gnu)
+    netbsd*)
       if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
 	archive_cmds='$LD -Bshareable -o $lib $libobjs $deplibs $linker_flags'  # a.out
       else
@@ -10520,18 +10476,6 @@ linux* | k*bsd*-gnu)
   # people can always --disable-shared, the test was removed, and we
   # assume the GNU/Linux dynamic linker is in use.
   dynamic_linker='GNU/Linux ld.so'
-  ;;
-
-netbsdelf*-gnu)
-  version_type=linux
-  need_lib_prefix=no
-  need_version=no
-  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major ${libname}${shared_ext}'
-  soname_spec='${libname}${release}${shared_ext}$major'
-  shlibpath_var=LD_LIBRARY_PATH
-  shlibpath_overrides_runpath=no
-  hardcode_into_libs=yes
-  dynamic_linker='NetBSD ld.elf_so'
   ;;
 
 netbsd*)
@@ -11374,7 +11318,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 11377 "configure"
+#line 11321 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11474,7 +11418,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 11477 "configure"
+#line 11421 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13062,7 +13006,7 @@ if test -z "$aix_libpath"; then aix_libpath="/usr/lib:/lib"; fi
 	;;
     esac
     ;;
-  netbsd* | netbsdelf*-gnu)
+  netbsd*)
     if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
       archive_cmds_CXX='$LD -Bshareable  -o $lib $predep_objects $libobjs $deplibs $postdep_objects $linker_flags'
       wlarc=
@@ -13766,7 +13710,7 @@ echo $ECHO_N "checking for $compiler option to produce PIC... $ECHO_C" >&6; }
 	    ;;
 	esac
 	;;
-      netbsd* | netbsdelf*-gnu)
+      netbsd*)
 	;;
       osf3* | osf4* | osf5*)
 	case $cc_basename in
@@ -13875,11 +13819,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13878: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13822: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13882: \$? = $ac_status" >&5
+   echo "$as_me:13826: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -13979,11 +13923,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13982: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13926: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13986: \$? = $ac_status" >&5
+   echo "$as_me:13930: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -14050,9 +13994,6 @@ echo $ECHO_N "checking whether the $compiler linker ($LD) supports shared librar
   ;;
   cygwin* | mingw*)
     export_symbols_cmds_CXX='$NM $libobjs $convenience | $global_symbol_pipe | $SED -e '\''/^[BCDGRS][ ]/s/.*[ ]\([^ ]*\)/\1 DATA/;/^.*[ ]__nm__/s/^.*[ ]__nm__\([^ ]*\)[ ][^ ]*/\1 DATA/;/^I[ ]/d;/^[AITW][ ]/s/.*[ ]//'\'' | sort | uniq > $export_symbols'
-  ;;
-  linux* | k*bsd*-gnu)
-    link_all_deplibs_CXX=no
   ;;
   *)
     export_symbols_cmds_CXX='$NM $libobjs $convenience | $global_symbol_pipe | $SED '\''s/.* //'\'' | sort | uniq > $export_symbols'
@@ -14498,18 +14439,6 @@ linux* | k*bsd*-gnu)
   # people can always --disable-shared, the test was removed, and we
   # assume the GNU/Linux dynamic linker is in use.
   dynamic_linker='GNU/Linux ld.so'
-  ;;
-
-netbsdelf*-gnu)
-  version_type=linux
-  need_lib_prefix=no
-  need_version=no
-  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major ${libname}${shared_ext}'
-  soname_spec='${libname}${release}${shared_ext}$major'
-  shlibpath_var=LD_LIBRARY_PATH
-  shlibpath_overrides_runpath=no
-  hardcode_into_libs=yes
-  dynamic_linker='NetBSD ld.elf_so'
   ;;
 
 netbsd*)
@@ -15577,11 +15506,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15580: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15509: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:15584: \$? = $ac_status" >&5
+   echo "$as_me:15513: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -15681,11 +15610,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15684: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15613: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:15688: \$? = $ac_status" >&5
+   echo "$as_me:15617: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -15946,13 +15875,12 @@ EOF
   $echo "local: *; };" >> $output_objdir/$libname.ver~
 	  $CC '"$tmp_sharedflag""$tmp_addflag"' $libobjs $deplibs $compiler_flags ${wl}-soname $wl$soname ${wl}-version-script ${wl}$output_objdir/$libname.ver -o $lib'
 	fi
-	link_all_deplibs_F77=no
       else
 	ld_shlibs_F77=no
       fi
       ;;
 
-    netbsd* | netbsdelf*-gnu)
+    netbsd*)
       if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
 	archive_cmds_F77='$LD -Bshareable $libobjs $deplibs $linker_flags -o $lib'
 	wlarc=
@@ -16475,7 +16403,7 @@ if test -z "$aix_libpath"; then aix_libpath="/usr/lib:/lib"; fi
       link_all_deplibs_F77=yes
       ;;
 
-    netbsd* | netbsdelf*-gnu)
+    netbsd*)
       if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
 	archive_cmds_F77='$LD -Bshareable -o $lib $libobjs $deplibs $linker_flags'  # a.out
       else
@@ -17132,18 +17060,6 @@ linux* | k*bsd*-gnu)
   # people can always --disable-shared, the test was removed, and we
   # assume the GNU/Linux dynamic linker is in use.
   dynamic_linker='GNU/Linux ld.so'
-  ;;
-
-netbsdelf*-gnu)
-  version_type=linux
-  need_lib_prefix=no
-  need_version=no
-  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major ${libname}${shared_ext}'
-  soname_spec='${libname}${release}${shared_ext}$major'
-  shlibpath_var=LD_LIBRARY_PATH
-  shlibpath_overrides_runpath=no
-  hardcode_into_libs=yes
-  dynamic_linker='NetBSD ld.elf_so'
   ;;
 
 netbsd*)
@@ -17901,11 +17817,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:17904: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:17820: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:17908: \$? = $ac_status" >&5
+   echo "$as_me:17824: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -18191,11 +18107,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:18194: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:18110: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:18198: \$? = $ac_status" >&5
+   echo "$as_me:18114: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -18295,11 +18211,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:18298: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:18214: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:18302: \$? = $ac_status" >&5
+   echo "$as_me:18218: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -18560,13 +18476,12 @@ EOF
   $echo "local: *; };" >> $output_objdir/$libname.ver~
 	  $CC '"$tmp_sharedflag""$tmp_addflag"' $libobjs $deplibs $compiler_flags ${wl}-soname $wl$soname ${wl}-version-script ${wl}$output_objdir/$libname.ver -o $lib'
 	fi
-	link_all_deplibs_GCJ=no
       else
 	ld_shlibs_GCJ=no
       fi
       ;;
 
-    netbsd* | netbsdelf*-gnu)
+    netbsd*)
       if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
 	archive_cmds_GCJ='$LD -Bshareable $libobjs $deplibs $linker_flags -o $lib'
 	wlarc=
@@ -19109,7 +19024,7 @@ if test -z "$aix_libpath"; then aix_libpath="/usr/lib:/lib"; fi
       link_all_deplibs_GCJ=yes
       ;;
 
-    netbsd* | netbsdelf*-gnu)
+    netbsd*)
       if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
 	archive_cmds_GCJ='$LD -Bshareable -o $lib $libobjs $deplibs $linker_flags'  # a.out
       else
@@ -19766,18 +19681,6 @@ linux* | k*bsd*-gnu)
   # people can always --disable-shared, the test was removed, and we
   # assume the GNU/Linux dynamic linker is in use.
   dynamic_linker='GNU/Linux ld.so'
-  ;;
-
-netbsdelf*-gnu)
-  version_type=linux
-  need_lib_prefix=no
-  need_version=no
-  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major ${libname}${shared_ext}'
-  soname_spec='${libname}${release}${shared_ext}$major'
-  shlibpath_var=LD_LIBRARY_PATH
-  shlibpath_overrides_runpath=no
-  hardcode_into_libs=yes
-  dynamic_linker='NetBSD ld.elf_so'
   ;;
 
 netbsd*)
@@ -21903,7 +21806,9 @@ else
   enable_man_pages=yes
 fi
 
- if test x$enable_man_pages = xyes; then
+
+
+if test x$enable_man_pages = xyes; then
   MAN_PAGES_ENABLED_TRUE=
   MAN_PAGES_ENABLED_FALSE='#'
 else
@@ -22020,7 +21925,9 @@ echo "${ECHO_T}no" >&6; }
     fi
   fi
 
-   if test x$enable_gtk_doc = xyes; then
+
+
+if test x$enable_gtk_doc = xyes; then
   ENABLE_GTK_DOC_TRUE=
   ENABLE_GTK_DOC_FALSE='#'
 else
@@ -22028,7 +21935,9 @@ else
   ENABLE_GTK_DOC_FALSE=
 fi
 
-   if test -n "$LIBTOOL"; then
+
+
+if test -n "$LIBTOOL"; then
   GTK_DOC_USE_LIBTOOL_TRUE=
   GTK_DOC_USE_LIBTOOL_FALSE='#'
 else
@@ -22054,7 +21963,9 @@ _ACEOF
 
 fi
 
- if test x$acpi_acpid != xyes; then
+
+
+if test x$acpi_acpid != xyes; then
   ACPI_ACPID_TRUE=
   ACPI_ACPID_FALSE='#'
 else
@@ -22078,7 +21989,9 @@ _ACEOF
 
 fi
 
- if test x$acpi_proc = xyes; then
+
+
+if test x$acpi_proc = xyes; then
   ACPI_PROC_TRUE=
   ACPI_PROC_FALSE='#'
 else
@@ -22104,7 +22017,9 @@ _ACEOF
   BUILD_ACPI_IBM=yes
 fi
 
- if test x$acpi_ibm = xyes; then
+
+
+if test x$acpi_ibm = xyes; then
   BUILD_ACPI_IBM_TRUE=
   BUILD_ACPI_IBM_FALSE='#'
 else
@@ -22130,7 +22045,9 @@ _ACEOF
   BUILD_ACPI_TOSHIBA=yes
 fi
 
- if test x$acpi_toshiba = xyes; then
+
+
+if test x$acpi_toshiba = xyes; then
   BUILD_ACPI_TOSHIBA_TRUE=
   BUILD_ACPI_TOSHIBA_FALSE='#'
 else
@@ -22499,7 +22416,9 @@ else
    USE_PARTED=no
 fi
 
- if test x$use_parted = xyes; then
+
+
+if test x$use_parted = xyes; then
   USE_PARTED_TRUE=
   USE_PARTED_FALSE='#'
 else
@@ -22595,7 +22514,9 @@ echo "$as_me: error: --enable-gcov can only be used with gcc" >&2;}
   fi
 fi
 
- if test x$enable_gcov = xyes; then
+
+
+if test x$enable_gcov = xyes; then
   GCOV_TRUE=
   GCOV_FALSE='#'
 else
@@ -23064,7 +22985,9 @@ fi
 else
     	USE_LIBUSB=no
 fi
- if test "x$USE_LIBUSB" = "xyes"; then
+
+
+if test "x$USE_LIBUSB" = "xyes"; then
   HAVE_LIBUSB_TRUE=
   HAVE_LIBUSB_FALSE='#'
 else
@@ -23163,6 +23086,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	if test "$LIB_SMBIOS" = "yes" ; then
    		{ echo "$as_me:$LINENO: checking for libsmbios >= 0.13.4" >&5
 echo $ECHO_N "checking for libsmbios >= 0.13.4... $ECHO_C" >&6; }
+   		LIBS="$LIBS -lsmbios"
    		if test "$cross_compiling" = yes; then
   { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
 See \`config.log' for more details." >&5
@@ -23215,7 +23139,9 @@ eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
   USE_SMBIOS=yes; { echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6; };  if true; then
+echo "${ECHO_T}yes" >&6; };
+
+if true; then
   HAVE_SMBIOS_TRUE=
   HAVE_SMBIOS_FALSE='#'
 else
@@ -23230,7 +23156,9 @@ sed 's/^/| /' conftest.$ac_ext >&5
 
 ( exit $ac_status )
 USE_SMBIOS=no; { echo "$as_me:$LINENO: result: failed" >&5
-echo "${ECHO_T}failed" >&6; };  if false; then
+echo "${ECHO_T}failed" >&6; };
+
+if false; then
   HAVE_SMBIOS_TRUE=
   HAVE_SMBIOS_FALSE='#'
 else
@@ -23245,7 +23173,9 @@ fi
 
 	else
   		USE_SMBIOS=no
-  		 if false; then
+
+
+if false; then
   HAVE_SMBIOS_TRUE=
   HAVE_SMBIOS_FALSE='#'
 else
@@ -23332,7 +23262,9 @@ fi
 
 else
     	USE_SMBIOS=no
-	 if false; then
+
+
+if false; then
   HAVE_SMBIOS_TRUE=
   HAVE_SMBIOS_FALSE='#'
 else
@@ -23563,7 +23495,9 @@ fi
 done
 
 fi
- if test "x$USE_LIBPCI" = "xyes"; then
+
+
+if test "x$USE_LIBPCI" = "xyes"; then
   HAVE_LIBPCI_TRUE=
   HAVE_LIBPCI_FALSE='#'
 else
@@ -23596,7 +23530,9 @@ else
 		   ;;
     esac
 fi
- if test x$HALD_BACKEND = xdummy; then
+
+
+if test x$HALD_BACKEND = xdummy; then
   HALD_COMPILE_DUMMY_TRUE=
   HALD_COMPILE_DUMMY_FALSE='#'
 else
@@ -23604,7 +23540,9 @@ else
   HALD_COMPILE_DUMMY_FALSE=
 fi
 
- if test x$HALD_BACKEND = xlinux; then
+
+
+if test x$HALD_BACKEND = xlinux; then
   HALD_COMPILE_LINUX_TRUE=
   HALD_COMPILE_LINUX_FALSE='#'
 else
@@ -23612,7 +23550,9 @@ else
   HALD_COMPILE_LINUX_FALSE=
 fi
 
- if test x$HALD_BACKEND = xfreebsd; then
+
+
+if test x$HALD_BACKEND = xfreebsd; then
   HALD_COMPILE_FREEBSD_TRUE=
   HALD_COMPILE_FREEBSD_FALSE='#'
 else
@@ -23620,7 +23560,9 @@ else
   HALD_COMPILE_FREEBSD_FALSE=
 fi
 
- if test x$HALD_BACKEND = xsolaris; then
+
+
+if test x$HALD_BACKEND = xsolaris; then
   HALD_COMPILE_SOLARIS_TRUE=
   HALD_COMPILE_SOLARIS_FALSE='#'
 else
@@ -23637,7 +23579,9 @@ _ACEOF
 
 
 # check for ConsoleKit
- if false; then
+
+
+if false; then
   HAVE_CONKIT_TRUE=
   HAVE_CONKIT_FALSE='#'
 else
@@ -23652,7 +23596,9 @@ fi
 
 msg_conkit=no
 if test "x$enable_console_kit" != "xno"; then
-    if true; then
+
+
+if true; then
   HAVE_CONKIT_TRUE=
   HAVE_CONKIT_FALSE='#'
 else
@@ -23743,7 +23689,9 @@ else
     have_gperf=yes
 fi
 
- if test x$have_gperf = xyes; then
+
+
+if test x$have_gperf = xyes; then
   HAVE_GPERF_TRUE=
   HAVE_GPERF_FALSE='#'
 else
@@ -23770,7 +23718,9 @@ elif test "x$with_keymaps" = "x" ; then
       ;;
   esac
 fi
- if test x$BUILD_KEYMAPS = xyes; then
+
+
+if test x$BUILD_KEYMAPS = xyes; then
   BUILD_KEYMAPS_TRUE=
   BUILD_KEYMAPS_FALSE='#'
 else
@@ -23780,7 +23730,9 @@ fi
 
 
 # check for PolicyKit
- if false; then
+
+
+if false; then
   HAVE_POLKIT_TRUE=
   HAVE_POLKIT_FALSE='#'
 else
@@ -23863,7 +23815,9 @@ fi
 
 	{ echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6; }
-                 if false; then
+
+
+if false; then
   HAVE_POLKIT_TRUE=
   HAVE_POLKIT_FALSE='#'
 else
@@ -23872,7 +23826,9 @@ else
 fi
 
 elif test $pkg_failed = untried; then
-	 if false; then
+
+
+if false; then
   HAVE_POLKIT_TRUE=
   HAVE_POLKIT_FALSE='#'
 else
@@ -23885,7 +23841,9 @@ else
 	POLKIT_LIBS=$pkg_cv_POLKIT_LIBS
         { echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6; }
-	 if true; then
+
+
+if true; then
   HAVE_POLKIT_TRUE=
   HAVE_POLKIT_FALSE='#'
 else
@@ -23953,7 +23911,9 @@ echo "$as_me: error: polkit-policy-file-validate not found" >&2;}
 fi
 
 # check for ACL handling
- if false; then
+
+
+if false; then
   HAVE_ACLMGMT_TRUE=
   HAVE_ACLMGMT_FALSE='#'
 else
@@ -23975,7 +23935,9 @@ if test "x$enable_acl_management" != "xno"; then
 echo "$as_me: error: ACL management support requires building with PolicyKit support" >&2;}
    { (exit 1); exit 1; }; }
    fi
-    if true; then
+
+
+if true; then
   HAVE_ACLMGMT_TRUE=
   HAVE_ACLMGMT_FALSE='#'
 else
@@ -23992,7 +23954,9 @@ _ACEOF
 fi
 
 # check for umount.hal
- if false; then
+
+
+if false; then
   HAVE_UMOUNT_HAL_TRUE=
   HAVE_UMOUNT_HAL_FALSE='#'
 else
@@ -24009,7 +23973,9 @@ fi
 
 msg_umount_hal=no
 if test "x$enable_umount_hal" != "xno"; then
-    if true; then
+
+
+if true; then
   HAVE_UMOUNT_HAL_TRUE=
   HAVE_UMOUNT_HAL_FALSE='#'
 else
@@ -24040,7 +24006,9 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 fi
- if test x$msg_acpi = xyes; then
+
+
+if test x$msg_acpi = xyes; then
   HAVE_ACPI_TRUE=
   HAVE_ACPI_FALSE='#'
 else
@@ -24062,7 +24030,9 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 fi
- if test x$msg_apm = xyes; then
+
+
+if test x$msg_apm = xyes; then
   HAVE_APM_TRUE=
   HAVE_APM_FALSE='#'
 else
@@ -24084,7 +24054,9 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 fi
- if test x$msg_pmu = xyes; then
+
+
+if test x$msg_pmu = xyes; then
   HAVE_PMU_TRUE=
   HAVE_PMU_FALSE='#'
 else
@@ -24120,7 +24092,9 @@ if test "x$with_deprecated_keys" = "xyes"; then
 else
    BUILD_DEPRECATED_KEYS=no
 fi
- if test x$BUILD_DEPRECATED_KEYS = xyes; then
+
+
+if test x$BUILD_DEPRECATED_KEYS = xyes; then
   BUILD_DEPRECATED_KEYS_TRUE=
   BUILD_DEPRECATED_KEYS_FALSE='#'
 else
@@ -25119,7 +25093,9 @@ echo "$as_me: error: Building DocBook docs explicitly required, but xmllint not 
     fi
 fi
 
- if test x$enable_docbook_docs = xyes; then
+
+
+if test x$enable_docbook_docs = xyes; then
   DOCBOOK_DOCS_ENABLED_TRUE=
   DOCBOOK_DOCS_ENABLED_FALSE='#'
 else
@@ -25162,7 +25138,9 @@ if test x$with_os_type = x; then
 fi
 
 # (distro-tweaks required)
- if test x$with_os_type = xunknown; then
+
+
+if test x$with_os_type = xunknown; then
   OS_TYPE_UNKNOWN_TRUE=
   OS_TYPE_UNKNOWN_FALSE='#'
 else
@@ -25170,7 +25148,9 @@ else
   OS_TYPE_UNKNOWN_FALSE=
 fi
 
- if test x$with_os_type = xredhat; then
+
+
+if test x$with_os_type = xredhat; then
   OS_TYPE_RED_HAT_TRUE=
   OS_TYPE_RED_HAT_FALSE='#'
 else
@@ -25201,7 +25181,9 @@ fi
 
 BUILD_PC=no
 
- if test x$BUILD_PC = xyes; then
+
+
+if test x$BUILD_PC = xyes; then
   BUILD_PC_TRUE=
   BUILD_PC_FALSE='#'
 else
@@ -25236,7 +25218,9 @@ elif test "x$with_macbookpro" = "x" ; then
     esac
    fi
 fi
- if test x$BUILD_MACBOOKPRO = xyes; then
+
+
+if test x$BUILD_MACBOOKPRO = xyes; then
   BUILD_MACBOOKPRO_TRUE=
   BUILD_MACBOOKPRO_FALSE='#'
 else
@@ -25271,7 +25255,9 @@ elif test "x$with_macbook" = "x" ; then
     esac
    fi
 fi
- if test x$BUILD_MACBOOK = xyes; then
+
+
+if test x$BUILD_MACBOOK = xyes; then
   BUILD_MACBOOK_TRUE=
   BUILD_MACBOOK_FALSE='#'
 else
@@ -25304,7 +25290,9 @@ elif test "x$with_imac" = "x" ; then
         ;;
     esac
 fi
- if test x$BUILD_IMAC = xyes; then
+
+
+if test x$BUILD_IMAC = xyes; then
   BUILD_IMAC_TRUE=
   BUILD_IMAC_FALSE='#'
 else
@@ -25323,7 +25311,9 @@ BUILD_ALS=no
 if test "x$with_als" = "xyes"; then
    BUILD_ALS=yes
 fi
- if test x$BUILD_ALS = xyes; then
+
+
+if test x$BUILD_ALS = xyes; then
   BUILD_ALS_TRUE=
   BUILD_ALS_FALSE='#'
 else
@@ -25356,7 +25346,9 @@ elif test "x$with_omap" = "x" ; then
 	;;
     esac
 fi
- if test x$BUILD_OMAP = xyes; then
+
+
+if test x$BUILD_OMAP = xyes; then
   BUILD_OMAP_TRUE=
   BUILD_OMAP_FALSE='#'
 else
@@ -25383,7 +25375,9 @@ elif test "x$with_cpufreq" = "x" ; then
       ;;
   esac
 fi
- if test x$BUILD_CPUFREQ = xyes; then
+
+
+if test x$BUILD_CPUFREQ = xyes; then
   BUILD_CPUFREQ_TRUE=
   BUILD_CPUFREQ_FALSE='#'
 else
@@ -25407,7 +25401,9 @@ elif test "x$with_usb_cable" = "x" ; then
      BUILD_USBCABLE=yes
    fi
 fi
- if test x$BUILD_USBCABLE = xyes; then
+
+
+if test x$BUILD_USBCABLE = xyes; then
   BUILD_USBCABLE_TRUE=
   BUILD_USBCABLE_FALSE='#'
 else
@@ -25433,7 +25429,9 @@ if test "x${USE_LIBUSB}" = "xyes" ; then
       fi
    fi
 fi
- if test x$BUILD_USBCSR = xyes; then
+
+
+if test x$BUILD_USBCSR = xyes; then
   BUILD_USBCSR_TRUE=
   BUILD_USBCSR_FALSE='#'
 else
@@ -25468,7 +25466,9 @@ elif test "x$with_dell_backlight" = "x" ; then
     esac
    fi
 fi
- if test x$BUILD_DELL = xyes; then
+
+
+if test x$BUILD_DELL = xyes; then
   BUILD_DELL_TRUE=
   BUILD_DELL_FALSE='#'
 else
@@ -25546,7 +25546,9 @@ _ACEOF
 
 fi
 msg_sonypic=$have_sonypic
- if test x$msg_sonypic = xyes; then
+
+
+if test x$msg_sonypic = xyes; then
   HAVE_SONYPIC_TRUE=
   HAVE_SONYPIC_FALSE='#'
 else
@@ -26400,7 +26402,6 @@ gives unlimited permission to copy, distribute and modify it."
 ac_pwd='$ac_pwd'
 srcdir='$srcdir'
 INSTALL='$INSTALL'
-MKDIR_P='$MKDIR_P'
 _ACEOF
 
 cat >>$CONFIG_STATUS <<\_ACEOF
@@ -26650,7 +26651,6 @@ target_alias!$target_alias$ac_delim
 INSTALL_PROGRAM!$INSTALL_PROGRAM$ac_delim
 INSTALL_SCRIPT!$INSTALL_SCRIPT$ac_delim
 INSTALL_DATA!$INSTALL_DATA$ac_delim
-am__isrc!$am__isrc$ac_delim
 CYGPATH_W!$CYGPATH_W$ac_delim
 PACKAGE!$PACKAGE$ac_delim
 VERSION!$VERSION$ac_delim
@@ -26659,6 +26659,7 @@ AUTOCONF!$AUTOCONF$ac_delim
 AUTOMAKE!$AUTOMAKE$ac_delim
 AUTOHEADER!$AUTOHEADER$ac_delim
 MAKEINFO!$MAKEINFO$ac_delim
+AMTAR!$AMTAR$ac_delim
 install_sh!$install_sh$ac_delim
 STRIP!$STRIP$ac_delim
 INSTALL_STRIP_PROGRAM!$INSTALL_STRIP_PROGRAM$ac_delim
@@ -26666,9 +26667,6 @@ mkdir_p!$mkdir_p$ac_delim
 AWK!$AWK$ac_delim
 SET_MAKE!$SET_MAKE$ac_delim
 am__leading_dot!$am__leading_dot$ac_delim
-AMTAR!$AMTAR$ac_delim
-am__tar!$am__tar$ac_delim
-am__untar!$am__untar$ac_delim
 MAINTAINER_MODE_TRUE!$MAINTAINER_MODE_TRUE$ac_delim
 MAINTAINER_MODE_FALSE!$MAINTAINER_MODE_FALSE$ac_delim
 MAINT!$MAINT$ac_delim
@@ -26707,6 +26705,9 @@ build_os!$build_os$ac_delim
 host!$host$ac_delim
 host_cpu!$host_cpu$ac_delim
 host_vendor!$host_vendor$ac_delim
+host_os!$host_os$ac_delim
+SED!$SED$ac_delim
+LN_S!$LN_S$ac_delim
 _ACEOF
 
   if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 97; then
@@ -26748,9 +26749,6 @@ _ACEOF
 ac_delim='%!_!# '
 for ac_last_try in false false false false false :; do
   cat >conf$$subs.sed <<_ACEOF
-host_os!$host_os$ac_delim
-SED!$SED$ac_delim
-LN_S!$LN_S$ac_delim
 ECHO!$ECHO$ac_delim
 AR!$AR$ac_delim
 RANLIB!$RANLIB$ac_delim
@@ -26845,6 +26843,9 @@ GLIB_CFLAGS!$GLIB_CFLAGS$ac_delim
 GLIB_LIBS!$GLIB_LIBS$ac_delim
 VOLUME_ID_CFLAGS!$VOLUME_ID_CFLAGS$ac_delim
 VOLUME_ID_LIBS!$VOLUME_ID_LIBS$ac_delim
+HALD_OS_LIBS!$HALD_OS_LIBS$ac_delim
+XMLTO!$XMLTO$ac_delim
+XMLLINT!$XMLLINT$ac_delim
 _ACEOF
 
   if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 97; then
@@ -26886,9 +26887,6 @@ _ACEOF
 ac_delim='%!_!# '
 for ac_last_try in false false false false false :; do
   cat >conf$$subs.sed <<_ACEOF
-HALD_OS_LIBS!$HALD_OS_LIBS$ac_delim
-XMLTO!$XMLTO$ac_delim
-XMLLINT!$XMLLINT$ac_delim
 DOCBOOK_DOCS_ENABLED_TRUE!$DOCBOOK_DOCS_ENABLED_TRUE$ac_delim
 DOCBOOK_DOCS_ENABLED_FALSE!$DOCBOOK_DOCS_ENABLED_FALSE$ac_delim
 DBUS_SYS_DIR!$DBUS_SYS_DIR$ac_delim
@@ -26924,7 +26922,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 36; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 33; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5
@@ -27151,11 +27149,6 @@ ac_abs_srcdir=$ac_abs_top_srcdir$ac_dir_suffix
   [\\/$]* | ?:[\\/]* ) ac_INSTALL=$INSTALL ;;
   *) ac_INSTALL=$ac_top_build_prefix$INSTALL ;;
   esac
-  ac_MKDIR_P=$MKDIR_P
-  case $MKDIR_P in
-  [\\/$]* | ?:[\\/]* ) ;;
-  */*) ac_MKDIR_P=$ac_top_build_prefix$MKDIR_P ;;
-  esac
 _ACEOF
 
 cat >>$CONFIG_STATUS <<\_ACEOF
@@ -27209,7 +27202,6 @@ s&@builddir@&$ac_builddir&;t t
 s&@abs_builddir@&$ac_abs_builddir&;t t
 s&@abs_top_builddir@&$ac_abs_top_builddir&;t t
 s&@INSTALL@&$ac_INSTALL&;t t
-s&@MKDIR_P@&$ac_MKDIR_P&;t t
 $ac_datarootdir_hack
 " $ac_file_inputs | sed -f "$tmp/subs-1.sed" | sed -f "$tmp/subs-2.sed" | sed -f "$tmp/subs-3.sed" >$tmp/out
 
@@ -27325,22 +27317,21 @@ echo "$as_me: $ac_file is unchanged" >&6;}
   fi
   rm -f "$tmp/out12"
 # Compute $ac_file's index in $config_headers.
-_am_arg=$ac_file
 _am_stamp_count=1
 for _am_header in $config_headers :; do
   case $_am_header in
-    $_am_arg | $_am_arg:* )
+    $ac_file | $ac_file:* )
       break ;;
     * )
       _am_stamp_count=`expr $_am_stamp_count + 1` ;;
   esac
 done
-echo "timestamp for $_am_arg" >`$as_dirname -- "$_am_arg" ||
-$as_expr X"$_am_arg" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
-	 X"$_am_arg" : 'X\(//\)[^/]' \| \
-	 X"$_am_arg" : 'X\(//\)$' \| \
-	 X"$_am_arg" : 'X\(/\)' \| . 2>/dev/null ||
-echo X"$_am_arg" |
+echo "timestamp for $ac_file" >`$as_dirname -- $ac_file ||
+$as_expr X$ac_file : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
+	 X$ac_file : 'X\(//\)[^/]' \| \
+	 X$ac_file : 'X\(//\)$' \| \
+	 X$ac_file : 'X\(/\)' \| . 2>/dev/null ||
+echo X$ac_file |
     sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{
 	    s//\1/
 	    q
@@ -27375,9 +27366,8 @@ echo "$as_me: executing $ac_file commands" >&6;}
   # some people rename them; so instead we look at the file content.
   # Grep'ing the first line is not enough: some people post-process
   # each Makefile.in and add a new line on top of each file to say so.
-  # Grep'ing the whole file is not good either: AIX grep has a line
-  # limit of 2048, but all sed's we know have understand at least 4000.
-  if sed -n 's,^#.*generated by automake.*,X,p' "$mf" | grep X >/dev/null 2>&1; then
+  # So let's grep whole file.
+  if grep '^#.*generated by automake' $mf > /dev/null 2>&1; then
     dirpart=`$as_dirname -- "$mf" ||
 $as_expr X"$mf" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
 	 X"$mf" : 'X\(//\)[^/]' \| \
@@ -27404,21 +27394,27 @@ echo X"$mf" |
   else
     continue
   fi
-  # Extract the definition of DEPDIR, am__include, and am__quote
-  # from the Makefile without running `make'.
+  grep '^DEP_FILES *= *[^ #]' < "$mf" > /dev/null || continue
+  # Extract the definition of DEP_FILES from the Makefile without
+  # running `make'.
   DEPDIR=`sed -n 's/^DEPDIR = //p' < "$mf"`
   test -z "$DEPDIR" && continue
-  am__include=`sed -n 's/^am__include = //p' < "$mf"`
-  test -z "am__include" && continue
-  am__quote=`sed -n 's/^am__quote = //p' < "$mf"`
   # When using ansi2knr, U may be empty or an underscore; expand it
   U=`sed -n 's/^U = //p' < "$mf"`
-  # Find all dependency output files, they are included files with
-  # $(DEPDIR) in their names.  We invoke sed twice because it is the
-  # simplest approach to changing $(DEPDIR) to its actual value in the
-  # expansion.
-  for file in `sed -n "
-    s/^$am__include $am__quote\(.*(DEPDIR).*\)$am__quote"'$/\1/p' <"$mf" | \
+  test -d "$dirpart/$DEPDIR" || mkdir "$dirpart/$DEPDIR"
+  # We invoke sed twice because it is the simplest approach to
+  # changing $(DEPDIR) to its actual value in the expansion.
+  for file in `sed -n '
+    /^DEP_FILES = .*\\\\$/ {
+      s/^DEP_FILES = //
+      :loop
+	s/\\\\$//
+	p
+	n
+	/\\\\$/ b loop
+      p
+    }
+    /^DEP_FILES = / s/^DEP_FILES = //p' < "$mf" | \
        sed -e 's/\$(DEPDIR)/'"$DEPDIR"'/g' -e 's/\$U/'"$U"'/g'`; do
     # Make sure the directory exists.
     test -f "$dirpart/$file" && continue

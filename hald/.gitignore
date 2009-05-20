@@ -1,0 +1,14 @@
+.deps
+.libs
+Makefile
+Makefile.in
+hald
+haldaemon
+hald_marshal.c
+hald_marshal.h
+hald-cache-test
+hald-generate-fdi-cache
+*.o
+*~
+.local-fdi
+massif.*

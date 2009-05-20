@@ -1,0 +1,15 @@
+debian/tmp/etc/
+debian/tmp/usr/bin/lshal
+debian/tmp/usr/bin/hal-device
+debian/tmp/usr/bin/hal-get-property
+debian/tmp/usr/bin/hal-set-property
+debian/tmp/usr/bin/hal-find-by-capability
+debian/tmp/usr/bin/hal-find-by-property
+debian/tmp/usr/bin/hal-disable-polling
+debian/tmp/usr/bin/hal-is-caller-locked-out
+debian/tmp/usr/bin/hal-lock
+debian/tmp/usr/sbin/
+debian/tmp/usr/lib/hal/
+debian/tmp/usr/share/hal/fdi
+debian/preferences.fdi  etc/hal/fdi/policy
+debian/debian-storage-policy-ignore-fixed-crypto-drives.fdi usr/share/hal/fdi/policy/10osvendor

@@ -1,0 +1,39 @@
+#!/bin/sh
+
+set -e
+
+#DEBHELPER#
+
+dbus_reload()
+{
+	dbus-send --print-reply --system --type=method_call \
+	          --dest=org.freedesktop.DBus \
+	          / org.freedesktop.DBus.ReloadConfig > /dev/null
+}
+
+if [ "$1" = "purge" ] ; then
+	# Tell dbus to reload it's configuration files only, when we purge the
+	# package, i.e. when we remove its conffiles in /etc/dbus-1/system.d/
+
+	if [ -x /etc/init.d/dbus ]; then
+		# XXX: maemo dbus package does not support force-reload ...
+		# invoke-rc.d dbus force-reload || true
+		dbus_reload || true
+	fi
+
+	if [ -x "$(command -v deluser)" ]; then
+		deluser --quiet --system haldaemon > /dev/null || true
+	elif [ -x "$(command -v userdel)" ]; then
+		userdel haldaemon > /dev/null || true
+		groupdel haldaemon > /dev/null || true
+	else
+		echo >&2 "Not removing haldaemon system account because deluser (or userdel) command was not found"
+	fi
+
+	rmdir /var/run/hald || true
+
+	rm -f /var/cache/hald/fdi-cache
+	rmdir /var/cache/hald || true
+fi
+
+exit 0

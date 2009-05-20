@@ -1,0 +1,7 @@
+.deps
+.libs
+Makefile
+Makefile.in
+hal-ipw-killswitch-linux
+*.o
+*~

@@ -1,0 +1,82 @@
+#!/usr/bin/make -f
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/autotools.mk
+include /usr/share/cdbs/1/rules/simple-patchsys.mk
+include /usr/share/cdbs/1/rules/utils.mk
+
+DEB_CONFIGURE_EXTRA_FLAGS := \
+                             --with-pid-file=/var/run/hald/hald.pid \
+                             --with-linux-input-header=$(CURDIR)/hald/linux/input_local.h \
+                             --with-omap \
+                             --with-als \
+                             --without-macbookpro \
+                             --disable-policy-kit \
+                             --disable-console-kit \
+                             --enable-docbook-docs=auto \
+                             --docdir=/usr/share/doc/hal-doc
+
+DEB_DH_INSTALLINIT_ARGS := -- start 20 2 3 4 5 . stop 16 0 1 6 .
+
+ifeq (,$(findstring nopci,$(DEB_BUILD_OPTIONS)))
+NOPCI=1
+endif
+
+# OMAP: force PCI off anyway.
+NOPCI=1
+
+ifdef NOPCI
+DEB_CONFIGURE_EXTRA_FLAGS += --disable-pci-ids \
+                             --disable-pnp-ids \
+                             --with-usb-ids=/usr/share/misc
+else
+DEB_CONFIGURE_EXTRA_FLAGS += --with-hwdata=/usr/share/misc
+endif
+
+DEB_HOST_ARCH_CPU := $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
+
+ifneq (,$(findstring $(DEB_HOST_ARCH_CPU),ppc))
+DEB_CONFIGURE_EXTRA_FLAGS += --enable-pmu
+else
+DEB_CONFIGURE_EXTRA_FLAGS += --disable-pmu
+endif
+
+ifneq (,$(findstring $(DEB_HOST_ARCH_CPU),i386 amd64 ia64))
+DEB_CONFIGURE_EXTRA_FLAGS += --enable-apm \
+                             --enable-acpi
+else
+DEB_CONFIGURE_EXTRA_FLAGS += --disable-apm \
+                             --disable-acpi
+endif
+
+# XXX: this will not work when switching to debhelper compat mode 5
+DEB_DH_STRIP_ARGS = $(if $(filter libhal1 libhal-storage1,$(cdbs_curpkg)),--dbg-package=$(cdbs_curpkg),)
+
+# XXX: not good that the build might change depending on the environment
+# Prefer hardware floating point if enabled
+ifneq (,$(findstring vfp,$(DEB_BUILD_OPTIONS)))
+	CFLAGS += -mfpu=vfp -mfloat-abi=softfp
+endif
+
+common-install-impl::
+	# Don't put links in /etc/dev.d and /etc/hotplug.d
+	rm -rf $(DEB_DESTDIR)/etc/hotplug.d
+	rm -rf $(DEB_DESTDIR)/etc/dev.d
+	rm -rf $(DEB_DESTDIR)/usr/lib/hal/hal.hotplug
+	# Remove hal's default udev rules files.. We ship our own
+	rm -rf $(DEB_DESTDIR)/etc/udev
+	# Remove the OMAP backlight addon, we don't use it for now
+	rm -f $(DEB_DESTDIR)/usr/share/hal/fdi/policy/10osvendor/10-omap-backlight.fdi
+	rm -f $(DEB_DESTDIR)/usr/lib/hal/hald-addon-omap-backlight
+	
+	install -m 644 -D debian/hal.event \
+		$(DEB_DESTDIR)/etc/event.d/hal
+	install -m 644 -D debian/hal.udev.rules \
+		$(DEB_DESTDIR)/etc/udev/rules.d/z99_hal.rules
+	install -m 755 -D debian/hal-unmount.sh \
+		$(DEB_DESTDIR)/usr/lib/hal/hal-unmount.sh
+
+install/hal::
+	# Remove executable bit as this is nothing that can be executed
+	chmod -x $(DEB_DESTDIR)/usr/lib/hal/scripts/hal-functions
+

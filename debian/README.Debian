@@ -1,0 +1,13 @@
+ 
+ The powermanagement callouts are in the default hal config
+ (org.freedesktop.Hal.Device.SystemPowerManagement and
+ org.freedesktop.Hal.Device.LaptopPanel) can be used by users in group
+ powerdev. The storage callouts (org.freedesktop.Hal.Device.Volume.*) can by
+ used by users in the group plugdev.
+
+ The acpi addon won't use the kernel acpi events interface but the acpid's
+ event  socket if acpid is installed. If acpid is removed, hal needs to be
+ restarted to enable monitoring of acpi events again. And if apci is installed,
+ hal needs a restart to free the kernels acpi events interface for acpid.
+
+ -- Sjoerd Simons <sjoerd@debian.org>
