@@ -1148,11 +1148,26 @@ hal_util_find_known_parent (const gchar *sysfs_path, HalDevice **parent, gchar *
 	gchar *parent_devpath;
 	char parentdevpath[HAL_PATH_MAX];
 	gboolean retval = FALSE;
+	gchar *parent_devpath_copy;
+	int retry_count = 5;
 
 	parent_devpath = g_strdup (sysfs_path);
+	/* we hack. we hack a lot and ugly */
+	parent_devpath_copy = g_strdup (parent_devpath);
+
 	while (TRUE) {
 		if (!get_parent_device (parent_devpath))
+		{
+			if (--retry_count > 0)
+			{
+				g_thread_yield();
+				g_free(parent_devpath);
+				parent_devpath = g_strdup (parent_devpath_copy);
+				continue;
+			}
+
 			break;
+		}
 
 		parent_dev = hal_device_store_match_key_value_string (hald_get_gdl (),
 								      "linux.sysfs_path",
@@ -1160,6 +1175,7 @@ hal_util_find_known_parent (const gchar *sysfs_path, HalDevice **parent, gchar *
 		if (parent_dev != NULL)
 			goto out;
 	}
+	g_free (parent_devpath_copy);
 	g_free (parent_devpath);
 	parent_devpath = NULL;
 
@@ -1168,12 +1184,20 @@ hal_util_find_known_parent (const gchar *sysfs_path, HalDevice **parent, gchar *
 	if ((target = hal_util_readlink (parentdevpath)) != NULL) {
 		parent_devpath = hal_util_get_normalized_path (sysfs_path, target);
 
+		retry_count = 5;
+
 		while (TRUE) {
 			parent_dev = hal_device_store_match_key_value_string (hald_get_gdl (),
 									      "linux.sysfs_path",
 									      parent_devpath);
 			if (parent_dev != NULL)
 				goto out;
+
+			if (--retry_count > 0)
+			{
+				g_thread_yield();
+				continue;
+			}
 
 			/* go up one directory */
 			if (!get_parent_device (parent_devpath))

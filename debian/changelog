@@ -1,9 +1,22 @@
-hal (0.5.12~git20090219-0maemo4+0m5) unstable; urgency=low
+hal (0.5.12~git20090219-0maemo6+0m5) unstable; urgency=low
 
   * This entry has been added by BIFH queue processor
     Suffix +0m5 added to package revision
 
- -- pekka lundstrom <pekka.lundstrom@nokia.com>  Wed, 20 May 2009 14:59:03 +0300
+ -- Kojo Aapo <aapo.kojo@nokia.com>  Tue, 10 Nov 2009 15:13:01 +0200
+
+hal (0.5.12~git20090219-0maemo6) unstable; urgency=low
+
+  * Added a retry logic in find_known_parent in case sysfs entries are not
+    yet ready when we try to read them. Fixes: NB#129301
+
+ -- Janne Karhunen <janne.karhunen@nokia.com>  Wed, 14 Oct 2009 12:13:59 +0300
+
+hal (0.5.12~git20090219-0maemo5) unstable; urgency=low
+
+  * Added vbus & softconn flags into usb_device namespace.
+
+ -- Janne Karhunen <janne.karhunen@nokia.com>  Thu, 04 Jun 2009 15:42:12 +0300
 
 hal (0.5.12~git20090219-0maemo4) unstable; urgency=low
 
