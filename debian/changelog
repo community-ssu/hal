@@ -1,9 +1,16 @@
-hal (0.5.12~git20090219-0maemo6+0m5) unstable; urgency=low
+hal (0.5.12~git20090219-0maemo7+0m5) unstable; urgency=low
 
   * This entry has been added by BIFH queue processor
     Suffix +0m5 added to package revision
 
- -- Kojo Aapo <aapo.kojo@nokia.com>  Tue, 10 Nov 2009 15:13:01 +0200
+ -- Chandra Vanipenta <ext-chandra.1.vanipenta@nokia.com>  Fri, 19 Feb 2010 12:05:14 +0200
+
+hal (0.5.12~git20090219-0maemo7) unstable; urgency=low
+
+  * Fixes: NB#157544: Added hal-dbg package
+  * Defined the autogen.sh in rules 
+
+ -- Sergey Yakubenko <EXT-Sergey.Yakubenko@nokia.com>  Wed, 17 Feb 2010 11:16:06 +0300
 
 hal (0.5.12~git20090219-0maemo6) unstable; urgency=low
 

@@ -24,6 +24,21 @@ Description: Hardware Abstraction Layer
  It maintains a list of devices that currently exist, and can provide
  information about those upon request.
 
+Package: hal-dbg
+Section: devel
+Architecture: any
+Depends: hal (= ${binary:Version})
+Description: Hardware Abstraction Layer - debugging symbols
+ HAL provides an abstract view on hardware.
+ .
+ This abstraction layer is simply an interface that makes it possible to
+ add support for new devices and new ways of connecting devices to the
+ computer, without modifying every application that uses the device.
+ It maintains a list of devices that currently exist, and can provide
+ information about those upon request.
+ .
+ This package contains debugging symbols.
+
 Package: hal-doc
 Architecture: all
 Section: doc
