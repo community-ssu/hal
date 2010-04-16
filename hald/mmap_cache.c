@@ -49,11 +49,13 @@
 
 extern void *rules_ptr;
 static size_t rules_size = 0;
+static gint regen_cache_success;
+static void regen_cache (void);
 
-int di_rules_init (void)
+struct cache_header* init_rules (void)
 {
 	struct cache_header	*header;
-	char 			*cachename;
+	char			*cachename;
 	int			fd;
 	struct stat		statbuf;
 
@@ -79,6 +81,19 @@ int di_rules_init (void)
 		DIE (("Couldn't mmap file '%s', errno=%d: %s", cachename, errno, strerror (errno)));
 
 	header = (struct cache_header*) rules_ptr;
+
+	close(fd);
+	return header;
+}
+
+int di_rules_init (void)
+{
+	struct cache_header *header = init_rules();
+	if (rules_size != header->all_rules_size) {
+		HAL_INFO(("Cache file corrupted, so regenerating"));
+		regen_cache();
+		header = init_rules();
+	}
 	HAL_INFO(("preprobe: offset=%08lx, size=%d", header->fdi_rules_preprobe,
 		header->fdi_rules_information - header->fdi_rules_preprobe));
 	HAL_INFO(("information: offset=%08lx, size=%d", header->fdi_rules_information,
@@ -86,12 +101,8 @@ int di_rules_init (void)
 	HAL_INFO(("policy: offset=%08lx, size=%d", header->fdi_rules_policy,
 		header->all_rules_size - header->fdi_rules_policy));
 
-	close(fd);
-
 	return 0;
 }
-
-static gint regen_cache_success;
 
 static void 
 regen_cache_cb (HalDevice *d, 

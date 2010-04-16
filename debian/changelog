@@ -1,9 +1,23 @@
-hal (0.5.12~git20090219-0maemo7+0m5) unstable; urgency=low
+hal (0.5.12~git20090219-0maemo9+0m5) unstable; urgency=low
 
   * This entry has been added by BIFH queue processor
-    Suffix +0m5 added to package revision
+    version has been changed to 0.5.12~git20090219-0maemo9+0m5
 
- -- Chandra Vanipenta <ext-chandra.1.vanipenta@nokia.com>  Fri, 19 Feb 2010 12:05:14 +0200
+ -- Chandra Vanipenta <ext-chandra.1.vanipenta@nokia.com>  Fri, 16 Apr 2010 09:59:25 +0300
+
+hal (0.5.12~git20090219-0maemo9) unstable; urgency=low
+
+  * Fixes: NB#163318: Device can't be powered ON after flashing
+
+ -- Sergey Yakubenko <EXT-Sergey.Yakubenko@nokia.com>  Fri, 09 Apr 2010 13:11:54 +0400
+
+hal (0.5.12~git20090219-0maemo8) unstable; urgency=low
+
+  * Fixes: NB#141486: Device is not reaching UI after booting
+  * Fix a crash in util.c
+  * Update maintainer field
+
+ -- Sergey Yakubenko <EXT-Sergey.Yakubenko@nokia.com>  Fri, 09 Apr 2010 11:43:09 +0400
 
 hal (0.5.12~git20090219-0maemo7) unstable; urgency=low
 

@@ -1,7 +1,7 @@
 Source: hal
 Section: admin
 Priority: optional
-Maintainer: Janne Karhunen <Janne.Karhunen@nokia.com>
+Maintainer: Sergey Yakubenko <EXT-Sergey.Yakubenko@nokia.com>
 Uploaders: David Weinehall <david.weinehall@nokia.com>, Philippe De Swert <philippe.swert-de@nokia.com>
 XS-Original-Maintainer: Sjoerd Simons <sjoerd@debian.org>
 XS-Original-Uploaders: Sebastian Dröge <slomo@ubuntu.com>
