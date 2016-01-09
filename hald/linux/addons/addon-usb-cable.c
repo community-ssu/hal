@@ -296,8 +296,18 @@ main (int argc, char **argv)
 
 	fd[0] = open (state_path, O_RDONLY);
 	if (fd[0] < 0) {
-		HAL_ERROR (("Failed to open '%s'", state_path));
-		return 1;
+		free (state_path);
+
+		if (!asprintf (&state_path, "%s/mode", sysfs_path)) {
+			HAL_ERROR (("Memory allocation problem"));
+			return 1;
+		}
+
+		fd[0] = open (state_path, O_RDONLY);
+		if (fd[0] < 0) {
+			HAL_ERROR (("Failed to open '%s'", state_path));
+			return 1;
+		}
 	}
 	fd[1] = open (CONN_PATH, O_RDONLY);
         if (fd[1] < 0) 

@@ -3,6 +3,9 @@
 <deviceinfo version="0.2">
 
   <device>
+    <match key="platform.id" string="musb-hdrc.0.auto">
+      <append key="button.type" type="string">usb.cable</append>
+    </match>
     <match key="button.type" string="usb.cable">
       <append key="info.addons" type="strlist">hald-addon-usb-cable</append>
     </match>
