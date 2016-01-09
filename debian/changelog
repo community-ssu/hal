@@ -1,3 +1,9 @@
+hal (0.5.12~git20090219-0maemo10) unstable; urgency=low
+
+  * Fix usb.cable sysfs path for upstream kernel
+
+ -- Pali Rohár <pali.rohar@gmail.com>  Sat, 09 Jan 2016 13:37:11 +0100
+
 hal (0.5.12~git20090219-0maemo9+0m5) unstable; urgency=low
 
   * This entry has been added by BIFH queue processor
